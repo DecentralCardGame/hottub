@@ -22,6 +22,7 @@ func Init() {
 	e.POST("/users", CreateUser)
 	e.PUT("/users/:id", UpdateUser)
 	e.DELETE("/users/:id", DeleteUser)
+	e.POST("/login", Login)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
