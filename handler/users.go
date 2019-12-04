@@ -1,20 +1,20 @@
-package hottub
+package handler
 
 import (
 	"github.com/labstack/echo"
-	db "hottub/db"
-	types "hottub/types"
+	"hottub/db"
+	"hottub/types"
 	"net/http"
 	"strconv"
 )
 
-func GetUsers(c echo.Context) error {
+func (h *Handler) GetUsers(c echo.Context) error {
 	var users []types.User
 	db.Manager().Find(&users)
 	return c.JSON(http.StatusOK, users)
 }
 
-func GetUsersById(c echo.Context) error {
+func (h *Handler) GetUsersById(c echo.Context) error {
 	var user types.User
 	id, err := strconv.Atoi(c.Param("id"))
 
@@ -25,7 +25,7 @@ func GetUsersById(c echo.Context) error {
 	return c.JSON(http.StatusOK, user)
 }
 
-func CreateUser(c echo.Context) error {
+func (h *Handler) CreateUser(c echo.Context) error {
 	user := new(types.User)
 
 	if err := c.Bind(user); err != nil {
@@ -38,7 +38,7 @@ func CreateUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, user)
 }
 
-func UpdateUser(c echo.Context) error {
+func (h *Handler) UpdateUser(c echo.Context) error {
 	reqUser := new(types.User)
 	var user types.User
 	id, err := strconv.Atoi(c.Param("id"))
@@ -52,14 +52,13 @@ func UpdateUser(c echo.Context) error {
 	}
 
 	db.Manager().First(&user, id)
-
 	db.Manager().NewRecord(reqUser)
 	db.Manager().Create(&reqUser)
 
 	return c.JSON(http.StatusOK, reqUser)
 }
 
-func DeleteUser(c echo.Context) error {
+func (h *Handler) DeleteUser(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 	db.Manager().Where("id = ?", id).Delete(&types.User{})
 	return c.String(http.StatusOK, "ok")

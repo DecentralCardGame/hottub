@@ -1,4 +1,4 @@
-package hottub
+package db
 
 import (
 	"github.com/jinzhu/gorm"
@@ -10,17 +10,4 @@ var db *gorm.DB
 var err error
 
 func Init() {
-	db, err = gorm.Open("sqlite3", "main.db")
-	if err != nil {
-		print(err.Error())
-		panic("failed to connect database")
-	}
-	defer db.Close()
-
-	// Migrate the schema
-	db.AutoMigrate(&hottub.User{})
-}
-
-func Manager() *gorm.DB {
-	return db
 }
