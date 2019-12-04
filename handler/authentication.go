@@ -18,16 +18,16 @@ func (h *Handler) Register(c echo.Context) (err error) {
 
 	// Validate
 	if u.Email == "" || u.Password == "" {
-		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "invalid email or password"}
+		return echo.NewHTTPError(http.StatusBadRequest, "Please provide valid credentials")
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.MinCost)
-	u.Password = string(hash)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+	u.Password = string(bytes)
 
 	// Save user
-	h.DB.NewRecord(u)
 	h.DB.Create(&u)
 
+	u.Password = "" // Don't send password
 	return c.JSON(http.StatusCreated, u)
 }
 
@@ -40,13 +40,13 @@ func (h *Handler) Login(c echo.Context) (err error) {
 
 	// Find user
 	var dbUser types.User
-	hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.MinCost)
 	h.DB.Where(&types.User{
-		Username: u.Username,
-		Password: string(hash),
+		Email: u.Email,
 	}).First(&dbUser)
 
-	// Equation logic
+	if err = bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(u.Password)); err != nil {
+		return echo.NewHTTPError(echo.ErrBadRequest.Code, "Login failed")
+	}
 
 	//-----
 	// JWT

@@ -5,8 +5,8 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
+	_ "github.com/mattn/go-sqlite3"
 	"hottub/handler"
-	"hottub/routes"
 	"hottub/types"
 )
 
