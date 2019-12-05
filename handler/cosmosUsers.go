@@ -43,7 +43,7 @@ func (h *Handler) GetCosmosSettings(c echo.Context) error {
 		return c.JSON(types.ErrorParameterNotInteger.Status, types.ErrorParameterNotInteger)
 	}
 	h.DB.First(&user, id).Related(&settings)
-	bytes, err := decrypt(settings.Mnemonic)
+	bytes, err := decrypt([]byte(settings.Mnemonic))
 	settings.Mnemonic = string(bytes)
 	return c.JSON(http.StatusOK, settings)
 }
