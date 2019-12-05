@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "dockerfileLines": [
                       "FROM golang",
-                      "WORKDIR /src/",
-                      "COPY . .",
+                      "COPY ./app /go/src/hottub",
+		      "WORKDIR /go/src/hottub",
                       "RUN go get -d -v ./...",
                       "RUN go build -o main .",
                       "FROM alpine:latest",
