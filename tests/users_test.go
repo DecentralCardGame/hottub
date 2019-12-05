@@ -49,19 +49,6 @@ func (s *Suite) SetupSuite() {
 	s.handler = &handler.Handler{DB: db}
 	s.handler.DB.LogMode(true)
 	s.echo = echo.New()
-}
-
-func (s *Suite) TestEcho() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	rec := httptest.NewRecorder()
-	c := s.echo.NewContext(req, rec)
-
-	// Router
-	s.Assert().NotNil(s.echo.Router())
-
-	// DefaultHTTPErrorHandler
-	s.echo.DefaultHTTPErrorHandler(errors.New("error"), c)
-	assert.Equal(s.T(), http.StatusInternalServerError, rec.Code)
 
 	gofakeit.Seed(time.Now().UnixNano())
 
@@ -78,6 +65,19 @@ func (s *Suite) TestEcho() {
 		Email:    s.testUser.Email,
 		Password: string(hash),
 	})
+}
+
+func (s *Suite) TestEcho() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+
+	// Router
+	s.Assert().NotNil(s.echo.Router())
+
+	// DefaultHTTPErrorHandler
+	s.echo.DefaultHTTPErrorHandler(errors.New("error"), c)
+	assert.Equal(s.T(), http.StatusInternalServerError, rec.Code)
 }
 
 func (s *Suite) TestCreateUserNil() {

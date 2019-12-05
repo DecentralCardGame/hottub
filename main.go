@@ -35,6 +35,7 @@ func main() {
 
 	// Migrate the schema
 	db.AutoMigrate(&types.User{})
+	db.AutoMigrate(&types.CosmosUser{})
 
 	h := &handler.Handler{DB: db}
 
@@ -44,6 +45,8 @@ func main() {
 	e.POST("/users", h.CreateUser)
 	e.PUT("/users/:id", h.UpdateUser)
 	e.DELETE("/users/:id", h.DeleteUser)
+	e.PUT("/settings/:id", h.UpdateUserCosmosSettings)
+	e.GET("/settings/:id", h.GetCosmosSettings)
 	e.POST("/login", h.Login)
 	e.POST("/register", h.Register)
 
