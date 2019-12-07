@@ -36,7 +36,7 @@ func main() {
 	var err error
 	if production {
 		log.Printf("--- PRODUCTION MODE ACTIVE ---")
-		db, err = gorm.Open("postgres", "host="+os.Getenv("PG_ADDRESS")+" port="+os.Getenv("PG_PORT")+" user="+os.Getenv("PG_USER")+" dbname="+os.Getenv("PG_DB")+" password="+os.Getenv("PG_PASSWORD"))
+		db, err = gorm.Open("postgres", "host="+os.Getenv("PG_ADDRESS")+" port="+os.Getenv("PG_PORT")+" user="+os.Getenv("PG_USER")+" dbname="+os.Getenv("PG_DB")+" password="+os.Getenv("PG_PASSWORD")+" sslmode=disable")
 	} else {
 		log.Printf("--- DEVELOPMENT MODE ACTIVE ---")
 		db, err = gorm.Open("sqlite3", "main.db")
