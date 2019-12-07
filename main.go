@@ -69,7 +69,7 @@ func main() {
 }
 
 func loadEnvironment() {
-	if os.Getenv("ENVIRONMENT") == "PRODUCTION" {
+	if os.Getenv("ENVIRONMENT") == "production" {
 		production = true
 	} else {
 		production = false
