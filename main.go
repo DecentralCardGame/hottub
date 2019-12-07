@@ -18,7 +18,7 @@ func main() {
 		SigningKey: []byte(handler.Key),
 		Skipper: func(c echo.Context) bool {
 			// Skip authentication for and signup login requests
-			if c.Path() == "/login" || c.Path() == "/register" {
+			if c.Path() == "/login" || c.Path() == "/register" || c.Path() == "/" {
 				return true
 			}
 			return false
