@@ -1,6 +1,8 @@
 FROM golang:latest
+LABEL maintainer="Thilo Billerbeck <thilo.billerbeck@officerent.de>"
 COPY . /go/src/hottub
 WORKDIR /go/src/hottub
-RUN go get -d -v ./...
-RUN go build -o main . 
-CMD [\"/go/src/hottub/main\"]
+RUN go mod download
+RUN go build -o main .
+RUN ls
+CMD ["./main"]
