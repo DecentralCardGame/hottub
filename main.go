@@ -2,15 +2,16 @@ package main
 
 import (
 	"fmt"
+	"hottub/handler"
+	"hottub/types"
+	"os"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
 	_ "github.com/mattn/go-sqlite3"
-	"hottub/handler"
-	"hottub/types"
-	"os"
 )
 
 var production bool
