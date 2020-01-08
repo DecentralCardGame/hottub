@@ -56,7 +56,6 @@ func initializeDB() {
 		print(err.Error())
 		panic("failed to connect database")
 	}
-	defer db.Close()
 
 	// Migrate the schema
 	db.AutoMigrate(&types.User{})

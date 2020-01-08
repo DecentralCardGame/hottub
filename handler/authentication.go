@@ -23,9 +23,13 @@ func (h *Handler) Register(c echo.Context) (err error) {
 
 	bytes, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	u.Password = string(bytes)
+	u.CosmosUser = types.CosmosUser{
+		Mnemonic: "",
+	}
 
 	// Save user
 	h.DB.Create(&u)
+	h.DB.Save(&u)
 
 	u.Password = "" // Don't send password
 	return c.JSON(http.StatusCreated, u)
