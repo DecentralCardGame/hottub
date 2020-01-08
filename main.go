@@ -74,6 +74,7 @@ func initializeEcho() {
 	e = echo.New()
 	e.Logger.SetLevel(log.ERROR)
 	e.Use(middleware.Logger())
+	e.Use(middleware.CORS())
 	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
 		SigningKey: []byte(handler.Key),
 		Skipper: func(c echo.Context) bool {
