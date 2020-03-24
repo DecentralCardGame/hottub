@@ -12,20 +12,18 @@ import (
 func (h *Handler) Register(c echo.Context) (err error) {
 	// Bind
 	u := &types.User{}
+
 	if err = c.Bind(u); err != nil {
 		return
 	}
 
 	// Validate
-	if u.Email == "" || u.Password == "" {
+	if u.Username == "" || u.Email == "" || u.Password == "" || u.Mnemonic == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "Please provide valid credentials")
 	}
 
 	bytes, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	u.Password = string(bytes)
-	u.CosmosUser = types.CosmosUser{
-		Mnemonic: "",
-	}
 
 	// Save user
 	h.DB.Create(&u)
@@ -45,7 +43,7 @@ func (h *Handler) Login(c echo.Context) (err error) {
 	// Find user
 	var dbUser types.User
 	h.DB.Where(&types.User{
-		Email: u.Email,
+		Username: u.Username,
 	}).First(&dbUser)
 
 	if err = bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(u.Password)); err != nil {
@@ -65,11 +63,11 @@ func (h *Handler) Login(c echo.Context) (err error) {
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
 	// Generate encoded token and send it as response
-	u.Token, err = token.SignedString([]byte(Key))
+	dbUser.Token, err = token.SignedString([]byte(Key))
 	if err != nil {
 		return err
 	}
 
-	u.Password = "" // Don't send password
-	return c.JSON(http.StatusOK, u)
+	dbUser.Password = "" // Don't send password
+	return c.JSON(http.StatusOK, dbUser)
 }
