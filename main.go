@@ -45,16 +45,16 @@ func registerRoutes() {
 
 func initializeDB() {
 	if production {
-		fmt.Printf("--- PRODUCTION MODE ACTIVE ---")
+		fmt.Printf("--- PRODUCTION MODE ACTIVE ---\n")
 		db, err = gorm.Open("postgres", "host="+os.Getenv("PG_ADDRESS")+" port="+os.Getenv("PG_PORT")+" user="+os.Getenv("PG_USER")+" dbname="+os.Getenv("PG_DB")+" password="+os.Getenv("PG_PASSWORD")+" sslmode=disable")
 	} else {
-		fmt.Printf("--- DEVELOPMENT MODE ACTIVE ---")
-		db, err = gorm.Open("sqlite3", "main.db")
+		fmt.Printf("--- DEVELOPMENT MODE ACTIVE ---\n")
+		db, err = gorm.Open("postgres", "host=localhost port=5432 user=postgres dbname=database sslmode=disable")
 	}
 
 	if err != nil {
-		print(err.Error())
-		panic("failed to connect database")
+		print(err.Error() + "\n")
+		panic("failed to connect database\n")
 	}
 
 	// Migrate the schema

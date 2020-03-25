@@ -2,8 +2,6 @@ name: hotthub
 services:
   database:
     type: postgres:10
-    portforward: true
+    portforward: 5432
     creds:
       database: database
-      user: user
-      password: password
