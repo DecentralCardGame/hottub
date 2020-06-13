@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   # the repository is likely to change in the future
-  repository: computibi/dcg-hottub-test
+  repository: crowdcontrol/hottub
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart version.
   tag: ""
