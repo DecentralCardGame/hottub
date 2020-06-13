@@ -23,6 +23,10 @@ jobs:
     needs: [build]
     steps:
     - uses: actions/checkout@v1
+    - uses: benjlevesque/short-sha@v1.1
+      id: short-sha
+      with:
+        length: 7
     - name: 'Deploy to Kubernetes'
       uses: 'deliverybot/helm@v1'
       with:
@@ -31,6 +35,6 @@ jobs:
         namespace: 'crowdcontrol-hottub'
         chart: 'helm'
         helm: 'helm3'
-        version: sha-${{GITHUB_SHA:7}}
+        version: sha-${{ steps.short-sha.outputs.sha }}
       env:
         KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
