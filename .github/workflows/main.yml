@@ -31,6 +31,6 @@ jobs:
         namespace: 'crowdcontrol-hottub'
         chart: 'helm'
         helm: 'helm3'
-        version: sha-${GITHUB_SHA:7}
+        version: sha-${{GITHUB_SHA:7}}
       env:
         KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
