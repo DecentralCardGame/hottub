@@ -35,6 +35,8 @@ jobs:
         namespace: 'crowdcontrol-hottub'
         chart: 'helm'
         helm: 'helm3'
+        values: |
+          image.tag: sha-${{ steps.short-sha.outputs.sha }}
         version: sha-${{ steps.short-sha.outputs.sha }}
       env:
         KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
