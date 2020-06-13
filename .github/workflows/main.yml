@@ -13,5 +13,8 @@ jobs:
     - name: Build and push Docker images
       uses: docker/build-push-action@v1.1.0
       with:
-        tag_with_ref: true
-        push: false
+        username: ${{ secrets.DockerUsername }}
+        password: ${{ secrets.DockerPassword }}
+        tag_with_sha: true
+        repository: crowdcontrol/hottub
+        push: true
