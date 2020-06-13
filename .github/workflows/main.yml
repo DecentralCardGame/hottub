@@ -28,13 +28,13 @@ jobs:
       with:
         length: 7
     - name: 'Deploy to Kubernetes'
-      uses: 'deliverybot/helm@v1'
+      uses: 'deliverybot/helm@master'
       with:
-        release: 'hottub'
+        release: production
         token: '${{ github.token }}'
-        namespace: 'crowdcontrol-hottub'
-        chart: 'helm'
-        helm: 'helm3'
+        namespace: crowdcontrol-hottub
+        chart: helm
+        helm: helm3
         values: |
           image.tag: sha-${{ steps.short-sha.outputs.sha }}
         version: sha-${{ steps.short-sha.outputs.sha }}
