@@ -28,7 +28,7 @@ jobs:
       with:
         length: 7
     - name: Deploy
-      uses: WyriHaximus/github-action-helm3@v1
+      uses: WyriHaximus/github-action-helm3@master
       with:
         exec: helm upgrade production helm --install --wait --atomic --namespace=crowdcontrol-hottub --set=app.name=production --set=image.tag=sha-${{ steps.short-sha.outputs.sha }}
         kubeconfig: '${{ secrets.KUBECONFIG }}'
