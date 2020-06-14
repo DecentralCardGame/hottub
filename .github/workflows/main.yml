@@ -27,16 +27,8 @@ jobs:
       id: short-sha
       with:
         length: 7
-    - name: 'Deploy to Kubernetes'
-      uses: 'deliverybot/helm@master'
+    - name: Deploy
+      uses: WyriHaximus/github-action-helm3@v1
       with:
-        release: production
-        token: '${{ github.token }}'
-        namespace: crowdcontrol-hottub
-        chart: helm
-        helm: helm3
-        values: |
-          image.tag: sha-${{ steps.short-sha.outputs.sha }}
-        version: sha-${{ steps.short-sha.outputs.sha }}
-      env:
-        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+        exec: helm upgrade production helm --install --wait --atomic --namespace=crowdcontrol-hottub --set=app.name=production --set=image.tag=sha-${{ steps.short-sha.outputs.sha }}
+        kubeconfig: '${{ secrets.KUBECONFIG }}'
