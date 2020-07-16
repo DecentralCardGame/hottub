@@ -1,0 +1,34 @@
+name: CI
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v1.1.0
+      with:
+        username: ${{ secrets.DockerUsername }}
+        password: ${{ secrets.DockerPassword }}
+        tag_with_sha: true
+        repository: crowdcontrol/hottub
+        push: true
+  deployment:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+    - uses: actions/checkout@v1
+    - uses: benjlevesque/short-sha@v1.1
+      id: short-sha
+      with:
+        length: 7
+    - name: Deploy
+      uses: WyriHaximus/github-action-helm3@v1.0.0
+      with:
+        exec: helm upgrade production helm --install --wait --atomic --namespace=crowdcontrol-hottub --set=app.name=production --set=image.tag=sha-${{ steps.short-sha.outputs.sha }}
+        kubeconfig: '${{ secrets.KUBECONFIG }}'
