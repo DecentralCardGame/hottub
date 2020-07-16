@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github.com/labstack/echo"
 	"hottub/types"
+	"hottub/utils"
 	"io"
 	"net/http"
 	"strconv"
@@ -18,11 +19,11 @@ func (h *Handler) UpdateUserCosmosSettings(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
-		return c.JSON(types.ErrorParameterNotInteger.Status, types.ErrorParameterNotInteger)
+		return c.JSON(utils.ErrorParameterNotInteger.Status, utils.ErrorParameterNotInteger)
 	}
 
 	if err = c.Bind(&reqSettings); err != nil {
-		return c.JSON(types.ErrorCannotParseFields.Status, types.ErrorCannotParseFields)
+		return c.JSON(utils.ErrorCannotParseFields.Status, utils.ErrorCannotParseFields)
 	}
 
 	enc, err := h.encryptMnemonic([]byte(reqSettings.Mnemonic))
@@ -40,7 +41,7 @@ func (h *Handler) GetCosmosSettings(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
-		return c.JSON(types.ErrorParameterNotInteger.Status, types.ErrorParameterNotInteger)
+		return c.JSON(utils.ErrorParameterNotInteger.Status, utils.ErrorParameterNotInteger)
 	}
 	h.DB.First(&user, id).Related(&settings)
 	bytes, err := decrypt([]byte(settings.Mnemonic))

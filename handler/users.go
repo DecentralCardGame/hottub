@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/labstack/echo"
 	"hottub/types"
+	"hottub/utils"
 	"net/http"
 	"strconv"
 )
@@ -18,7 +19,7 @@ func (h *Handler) GetUsersById(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
-		return c.JSON(types.ErrorParameterNotInteger.Status, types.ErrorParameterNotInteger)
+		return c.JSON(utils.ErrorParameterNotInteger.Status, utils.ErrorParameterNotInteger)
 	}
 	h.DB.First(&user, id)
 	return c.JSON(http.StatusOK, user)
@@ -28,7 +29,7 @@ func (h *Handler) CreateUser(c echo.Context) error {
 	user := new(types.User)
 
 	if err := c.Bind(user); err != nil {
-		return c.JSON(types.ErrorCannotParseFields.Status, types.ErrorCannotParseFields)
+		return c.JSON(utils.ErrorCannotParseFields.Status, utils.ErrorCannotParseFields)
 	}
 
 	h.DB.NewRecord(user)
@@ -43,11 +44,11 @@ func (h *Handler) UpdateUser(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
-		return c.JSON(types.ErrorParameterNotInteger.Status, types.ErrorParameterNotInteger)
+		return c.JSON(utils.ErrorParameterNotInteger.Status, utils.ErrorParameterNotInteger)
 	}
 
 	if err = c.Bind(reqUser); err != nil {
-		return c.JSON(types.ErrorCannotParseFields.Status, types.ErrorCannotParseFields)
+		return c.JSON(utils.ErrorCannotParseFields.Status, utils.ErrorCannotParseFields)
 	}
 
 	h.DB.First(&user, id)

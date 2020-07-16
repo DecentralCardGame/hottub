@@ -2,55 +2,43 @@ package handler
 
 import (
 	"github.com/labstack/echo"
-	"golang.org/x/crypto/bcrypt"
 	"hottub/types"
 	"hottub/utils"
 	"net/http"
 )
 
 func (h *Handler) Register(c echo.Context) (err error) {
-	// Bind
-	u := &types.User{}
+	var u types.User
+	req := &types.UserRegisterRequest{}
 
-	if err = c.Bind(u); err != nil {
-		return
+	if err := req.Bind(c, &u); err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 	}
-
-	// Validate
-	if u.Username == "" || u.Email == "" || u.Password == "" || u.Mnemonic == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "Please provide valid credentials")
-	}
-
-	bytes, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
-	u.Password = string(bytes)
 
 	// Save user
+	// TODO: Move logic to store
 	h.DB.Create(&u)
 	h.DB.Save(&u)
 
-	u.Password = "" // Don't send password
-	return c.JSON(http.StatusCreated, u)
+	return c.JSON(http.StatusOK, types.NewUserLoginResponse(&u))
 }
 
 func (h *Handler) Login(c echo.Context) (err error) {
-	// Bind
-	u := new(types.User)
-	if err = c.Bind(u); err != nil {
-		return
+	req := &types.UserLoginRequest{}
+
+	if err := req.Bind(c); err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 	}
 
 	// Find user
+	// TODO: Move logic to store
 	var dbUser types.User
 	h.DB.Where(&types.User{
-		Username: u.Username,
+		Username: req.Username,
 	}).First(&dbUser)
 
-	if err = bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(u.Password)); err != nil {
-		return echo.NewHTTPError(echo.ErrBadRequest.Code, "Login failed")
+	if !dbUser.ComparePassword(req.Password) {
+		return c.JSON(http.StatusForbidden, utils.AccessForbidden())
 	}
-
-	dbUser.Token = utils.GenerateJWT(u.ID)
-
-	dbUser.Password = "" // Don't send password
-	return c.JSON(http.StatusOK, dbUser)
+	return c.JSON(http.StatusOK, types.NewUserLoginResponse(&dbUser))
 }
