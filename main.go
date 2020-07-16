@@ -2,17 +2,25 @@ package main
 
 import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/swaggo/echo-swagger"
 	"hottub/database"
+	_ "hottub/docs"
 	"hottub/handler"
 )
 
 var h *handler.Handler
 var e *echo.Echo
 
+// @title Crowdcontrol Hottub
+// @version 1.0
+// @description The API that controls authentication and user-management in CrowdControl
+
+// @host hottub.crowdcontrol.network
+// @BasePath /
 func main() {
 	db := database.New()
 	initializeEcho()
@@ -33,6 +41,7 @@ func registerRoutes() {
 	e.GET("/settings/:id", h.GetCosmosSettings)
 	e.POST("/login", h.Login)
 	e.POST("/register", h.Register)
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 }
 
 func initializeEcho() {
@@ -49,7 +58,7 @@ func initializeEcho() {
 		SigningKey: []byte(handler.Key),
 		Skipper: func(c echo.Context) bool {
 			// Skip authentication for and signup login requests
-			if c.Path() == "/login" || c.Path() == "/register" || c.Path() == "/" {
+			if c.Path() == "/login" || c.Path() == "/register" || c.Path() == "/" || c.Path() == "/swagger/*" {
 				return true
 			}
 			return false

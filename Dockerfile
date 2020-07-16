@@ -11,6 +11,8 @@ COPY go.sum .
 RUN go mod download
 # Now copy the rest of the sources, which in most cases have changed
 COPY . .
+RUN go get -u github.com/swaggo/swag/cmd/swag
+RUN swag init
 RUN go build -a -installsuffix cgo -o main .
 
 FROM alpine:latest  

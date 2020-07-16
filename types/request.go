@@ -1,6 +1,6 @@
 package types
 
-import "github.com/labstack/echo"
+import "github.com/labstack/echo/v4"
 
 type UserLoginRequest struct {
 	Username string `json:"username" validate:"required,email"`

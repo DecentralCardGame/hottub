@@ -57,4 +57,5 @@ func NewWelcomeResponse() *WelcomeResponse {
 	r := new(WelcomeResponse)
 	r.Name = "DecentralCardGame - Hottub"
 	r.Version = "v1"
+	return r
 }
