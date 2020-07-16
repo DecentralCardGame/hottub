@@ -47,3 +47,14 @@ func NewPublicUsersResponse(users []User) *PublicUsersRepsonse {
 	}
 	return r
 }
+
+type WelcomeResponse struct {
+	Name    string `json:"name"`
+	Version string `json:"version"`
+}
+
+func NewWelcomeResponse() *WelcomeResponse {
+	r := new(WelcomeResponse)
+	r.Name = "DecentralCardGame - Hottub"
+	r.Version = "v1"
+}
