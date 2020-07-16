@@ -11,7 +11,7 @@ import (
 func (h *Handler) GetUsers(c echo.Context) error {
 	var users []types.User
 	h.DB.Find(&users)
-	return c.JSON(http.StatusOK, users)
+	return c.JSON(http.StatusOK, types.NewPublicUsersResponse(users))
 }
 
 func (h *Handler) GetUsersById(c echo.Context) error {
@@ -22,7 +22,7 @@ func (h *Handler) GetUsersById(c echo.Context) error {
 		return c.JSON(utils.ErrorParameterNotInteger.Status, utils.ErrorParameterNotInteger)
 	}
 	h.DB.First(&user, id)
-	return c.JSON(http.StatusOK, user)
+	return c.JSON(http.StatusOK, types.NewUserLoginResponse(&user))
 }
 
 func (h *Handler) CreateUser(c echo.Context) error {
@@ -35,7 +35,7 @@ func (h *Handler) CreateUser(c echo.Context) error {
 	h.DB.NewRecord(user)
 	h.DB.Create(&user)
 
-	return c.JSON(http.StatusOK, user)
+	return c.JSON(http.StatusOK, types.NewUserLoginResponse(user))
 }
 
 func (h *Handler) UpdateUser(c echo.Context) error {
@@ -55,7 +55,7 @@ func (h *Handler) UpdateUser(c echo.Context) error {
 	h.DB.NewRecord(reqUser)
 	h.DB.Create(&reqUser)
 
-	return c.JSON(http.StatusOK, reqUser)
+	return c.JSON(http.StatusOK, types.NewUserLoginResponse(&user))
 }
 
 func (h *Handler) DeleteUser(c echo.Context) error {

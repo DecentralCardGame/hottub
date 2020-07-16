@@ -19,3 +19,31 @@ func NewUserLoginResponse(u *User) *UserLoginResponse {
 	r.Token = utils.GenerateJWT(u.ID)
 	return r
 }
+
+type PublicUserResponse struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+}
+
+type PublicUsersRepsonse struct {
+	Users []*PublicUserResponse `json:"users"`
+}
+
+func NewPublicUserResponse(u *User) *PublicUserResponse {
+	r := new(PublicUserResponse)
+	r.Email = u.Email
+	u.Username = u.Username
+	return r
+}
+
+func NewPublicUsersResponse(users []User) *PublicUsersRepsonse {
+	r := new(PublicUsersRepsonse)
+	r.Users = make([]*PublicUserResponse, 0)
+	for _, u := range users {
+		ur := new(PublicUserResponse)
+		ur.Username = u.Username
+		ur.Email = u.Email
+		r.Users = append(r.Users, ur)
+	}
+	return r
+}
