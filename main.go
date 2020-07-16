@@ -1,29 +1,21 @@
 package main
 
 import (
-	"fmt"
-	"hottub/handler"
-	"hottub/types"
-	"os"
-
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
 	_ "github.com/mattn/go-sqlite3"
+	"hottub/database"
+	"hottub/handler"
 )
 
-var production bool
 var h *handler.Handler
 var e *echo.Echo
-var db *gorm.DB
-var err error
 
 func main() {
-	loadEnvironment()
+	db := database.New()
 	initializeEcho()
-	initializeDB()
 	h = &handler.Handler{DB: db}
 	registerRoutes()
 
@@ -43,38 +35,16 @@ func registerRoutes() {
 	e.POST("/register", h.Register)
 }
 
-func initializeDB() {
-	if production {
-		fmt.Printf("--- PRODUCTION MODE ACTIVE ---\n")
-		db, err = gorm.Open("postgres", "host="+os.Getenv("PG_ADDRESS")+" port="+os.Getenv("PG_PORT")+" user="+os.Getenv("PG_USER")+" dbname="+os.Getenv("PG_DB")+" password="+os.Getenv("PG_PASSWORD")+" sslmode=disable")
-	} else {
-		fmt.Printf("--- DEVELOPMENT MODE ACTIVE ---\n")
-		db, err = gorm.Open("postgres", "host=localhost port=5432 user=postgres dbname=database sslmode=disable")
-	}
-
-	if err != nil {
-		print(err.Error() + "\n")
-		panic("failed to connect database\n")
-	}
-
-	// Migrate the schema
-	db.AutoMigrate(&types.User{})
-	db.AutoMigrate(&types.CosmosUser{})
-}
-
-func loadEnvironment() {
-	if os.Getenv("ENVIRONMENT") == "production" {
-		production = true
-	} else {
-		production = false
-	}
-}
-
 func initializeEcho() {
 	e = echo.New()
-	e.Logger.SetLevel(log.ERROR)
+	e.Logger.SetLevel(log.DEBUG)
 	e.Use(middleware.Logger())
-	e.Use(middleware.CORS())
+	e.Pre(middleware.RemoveTrailingSlash())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
+		AllowMethods: []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE},
+	}))
 	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
 		SigningKey: []byte(handler.Key),
 		Skipper: func(c echo.Context) bool {

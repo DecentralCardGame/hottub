@@ -113,7 +113,7 @@ func (s *Suite) TestCreateUser() {
 		assert.Equal(s.T(), jsonRequest.Username, jsonResponse.Username)
 		assert.Equal(s.T(), jsonRequest.Email, jsonResponse.Email)
 
-		// test db
+		// test database
 		var user types.User
 		s.handler.DB.First(&user, jsonResponse.ID)
 		assert.Equal(s.T(), jsonResponse.Username, user.Username)

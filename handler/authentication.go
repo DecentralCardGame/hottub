@@ -1,12 +1,11 @@
 package handler
 
 import (
-	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	"golang.org/x/crypto/bcrypt"
 	"hottub/types"
+	"hottub/utils"
 	"net/http"
-	"time"
 )
 
 func (h *Handler) Register(c echo.Context) (err error) {
@@ -50,23 +49,7 @@ func (h *Handler) Login(c echo.Context) (err error) {
 		return echo.NewHTTPError(echo.ErrBadRequest.Code, "Login failed")
 	}
 
-	//-----
-	// JWT
-	//-----
-
-	// Create token
-	token := jwt.New(jwt.SigningMethodHS256)
-
-	// Set claims
-	claims := token.Claims.(jwt.MapClaims)
-	claims["id"] = u.ID
-	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
-
-	// Generate encoded token and send it as response
-	dbUser.Token, err = token.SignedString([]byte(Key))
-	if err != nil {
-		return err
-	}
+	dbUser.Token = utils.GenerateJWT(u.ID)
 
 	dbUser.Password = "" // Don't send password
 	return c.JSON(http.StatusOK, dbUser)
