@@ -25,6 +25,7 @@ var e *echo.Echo
 func main() {
 	db := database.New()
 	initializeEcho()
+	database.AutoMigrate(db)
 	h = &handler.Handler{DB: db}
 	registerRoutes()
 

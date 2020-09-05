@@ -17,6 +17,9 @@ import (
 // @Success 200 {object} types.PublicUsersRepsonse "ok"
 // @Router /users [get]
 func (h *Handler) GetUsers(c echo.Context) error {
+	// temporarilly prevent this from being called
+	// TODO reimplementation
+	return c.JSON(http.StatusForbidden, utils.AccessForbidden())
 	var users []types.User
 	h.DB.Find(&users)
 	return c.JSON(http.StatusOK, types.NewPublicUsersResponse(users))
@@ -32,6 +35,8 @@ func (h *Handler) GetUsers(c echo.Context) error {
 // @Success 200 {object} types.PublicUserResponse	"ok"
 // @Router /users/{id} [get]
 func (h *Handler) GetUsersById(c echo.Context) error {
+	// TODO reimplementation
+	return c.JSON(http.StatusForbidden, utils.AccessForbidden())
 	var user types.User
 	id, err := strconv.Atoi(c.Param("id"))
 
@@ -55,6 +60,8 @@ func (h *Handler) GetUsersById(c echo.Context) error {
 // @Success 200 {object} types.PublicUserResponse	"ok"
 // @Router /users [post]
 func (h *Handler) CreateUser(c echo.Context) error {
+	// TODO reimplementation
+	return c.JSON(http.StatusForbidden, utils.AccessForbidden())
 	user := new(types.User)
 
 	if err := c.Bind(user); err != nil {
@@ -77,6 +84,8 @@ func (h *Handler) CreateUser(c echo.Context) error {
 // @Success 200 {object} types.PublicUserResponse	"ok"
 // @Router /users/{id} [put]
 func (h *Handler) UpdateUser(c echo.Context) error {
+	// TODO reimplementation
+	return c.JSON(http.StatusForbidden, utils.AccessForbidden())
 	reqUser := new(types.User)
 	var user types.User
 	id, err := strconv.Atoi(c.Param("id"))
@@ -106,6 +115,8 @@ func (h *Handler) UpdateUser(c echo.Context) error {
 // @Success 200 {string} string	"ok"
 // @Router /users/{id} [delete]
 func (h *Handler) DeleteUser(c echo.Context) error {
+	// TODO reimplementation
+	return c.JSON(http.StatusForbidden, utils.AccessForbidden())
 	id, _ := strconv.Atoi(c.Param("id"))
 	h.DB.Where("id = ?", id).Delete(&types.User{})
 	return c.String(http.StatusOK, "ok")

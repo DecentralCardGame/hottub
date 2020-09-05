@@ -14,6 +14,7 @@ type User struct {
 	Mnemonic   string     `json:"mnemonic" form:"mnemonic" query:"mnemonic"`
 	CosmosUser CosmosUser `json:"cosmos_user" form:"cosmos_user" query:"cosmos_user" gorm:"ForeignKey:ID"`
 	Token      string     `json:"token" form:"token" query:"token"`
+	Admin      bool       `gorm:"default:false" json:"admin" query:"admin"`
 }
 
 func (u *User) HashPassword(plain string) (string, error) {
