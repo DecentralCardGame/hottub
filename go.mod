@@ -8,6 +8,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-openapi/spec v0.19.9 // indirect
 	github.com/go-openapi/swag v0.19.9 // indirect
+	github.com/go-playground/validator/v10 v10.3.0
 	github.com/jinzhu/gorm v1.9.11
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo/v4 v4.0.0

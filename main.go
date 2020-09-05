@@ -10,6 +10,7 @@ import (
 	"hottub/database"
 	_ "hottub/docs"
 	"hottub/handler"
+	"hottub/types"
 )
 
 var h *handler.Handler
@@ -47,6 +48,7 @@ func registerRoutes() {
 func initializeEcho() {
 	e = echo.New()
 	e.Logger.SetLevel(log.DEBUG)
+	e.Validator = types.NewValidator()
 	e.Use(middleware.Logger())
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
