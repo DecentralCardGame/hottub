@@ -104,9 +104,33 @@ func (us *UserStore) CheckUserMe(context int, id int) (bool, error) {
 	return m.IsMe(uint(id)), nil
 }
 
+func (us *UserStore) CheckUserAdminOrMe(context int, id int) (bool, error) {
+	var m User
+
+	if err := us.db.First(&m, context).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return false, nil
+		}
+		return false, err
+	}
+
+	return m.IsMe(uint(id)) || m.IsAdmin(), nil
+}
+
 // Create user
 func (us *UserStore) CreateNewUser(user *User) error {
 	return us.db.Create(&user).Error
+}
+
+// Update user
+func (us *UserStore) UpdateUser(reqUser *User) {
+	us.db.NewRecord(reqUser)
+	us.db.Create(&reqUser)
+}
+
+// Delete user
+func (us *UserStore) DeleteUser(id int) error {
+	return us.db.Delete(&User{}, id).Error
 }
 
 // Get all users

@@ -47,14 +47,13 @@ func (h *Handler) GetUsersById(c echo.Context) error {
 		return c.JSON(utils.ErrorParameterNotInteger.Status, utils.ErrorParameterNotInteger)
 	}
 
-	isAdmin, err := h.UserStore.CheckUserAdmin(utils.GetUserIDFromContext(c))
-	isMe, err := h.UserStore.CheckUserMe(utils.GetUserIDFromContext(c), id)
+	isAdminOrMe, err := h.UserStore.CheckUserAdminOrMe(utils.GetUserIDFromContext(c), id)
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, utils.NewError(err))
 	}
 
-	if !isAdmin && !isMe {
+	if !isAdminOrMe {
 		return c.JSON(http.StatusForbidden, utils.AccessForbidden())
 	}
 
@@ -109,22 +108,20 @@ func (h *Handler) CreateUser(c echo.Context) error {
 // @Success 200 {object} types.PublicUserResponse	"ok"
 // @Router /users/{id} [put]
 func (h *Handler) UpdateUser(c echo.Context) error {
-	reqUser := new(types.User)
-	var user types.User
+	reqUser := &types.User{}
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
 		return c.JSON(utils.ErrorParameterNotInteger.Status, utils.ErrorParameterNotInteger)
 	}
 
-	isAdmin, err := h.UserStore.CheckUserAdmin(utils.GetUserIDFromContext(c))
-	isMe, err := h.UserStore.CheckUserMe(utils.GetUserIDFromContext(c), id)
+	isAdminOrMe, err := h.UserStore.CheckUserAdminOrMe(utils.GetUserIDFromContext(c), id)
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, utils.NewError(err))
 	}
 
-	if !isAdmin && !isMe {
+	if !isAdminOrMe {
 		return c.JSON(http.StatusForbidden, utils.AccessForbidden())
 	}
 
@@ -132,11 +129,9 @@ func (h *Handler) UpdateUser(c echo.Context) error {
 		return c.JSON(utils.ErrorCannotParseFields.Status, utils.ErrorCannotParseFields)
 	}
 
-	h.DB.First(&user, id)
-	h.DB.NewRecord(reqUser)
-	h.DB.Create(&reqUser)
+	h.UserStore.UpdateUser(reqUser)
 
-	return c.JSON(http.StatusOK, types.NewPublicUserResponse(&user))
+	return c.JSON(http.StatusOK, types.NewPublicUserResponse(reqUser))
 }
 
 // Delete User
@@ -166,6 +161,11 @@ func (h *Handler) DeleteUser(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, utils.AccessForbidden())
 	}
 
-	h.DB.Where("id = ?", id).Delete(&types.User{})
+	err = h.UserStore.DeleteUser(id)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
+	}
+
 	return c.String(http.StatusOK, "ok")
 }
