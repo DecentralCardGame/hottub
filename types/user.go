@@ -74,12 +74,10 @@ func (us *UserStore) GetByUsername(username string) (*User, error) {
 }
 
 // Check whether user is admin
-func (us *UserStore) CheckUserAdmin(username string) (bool, error) {
+func (us *UserStore) CheckUserAdmin(id int) (bool, error) {
 	var m User
 
-	if err := us.db.First(&m, User{
-		Username: username,
-	}).Error; err != nil {
+	if err := us.db.First(&m, id).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return false, nil
 		}
@@ -92,4 +90,11 @@ func (us *UserStore) CheckUserAdmin(username string) (bool, error) {
 // Create user
 func (us *UserStore) CreateNewUser(user *User) error {
 	return us.db.Create(&user).Error
+}
+
+// Get all users
+func (us *UserStore) GetAllUsers() []User {
+	var users []User
+	us.db.Find(&users)
+	return users
 }

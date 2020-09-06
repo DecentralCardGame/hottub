@@ -17,12 +17,17 @@ import (
 // @Success 200 {object} types.PublicUsersRepsonse "ok"
 // @Router /users [get]
 func (h *Handler) GetUsers(c echo.Context) error {
-	// temporarilly prevent this from being called
-	// TODO reimplementation
-	return c.JSON(http.StatusForbidden, utils.AccessForbidden())
-	var users []types.User
-	h.DB.Find(&users)
-	return c.JSON(http.StatusOK, types.NewPublicUsersResponse(users))
+	isAdmin, err := h.UserStore.CheckUserAdmin(utils.GetUserIDFromContext(c))
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewError(err))
+	}
+
+	if !isAdmin {
+		return c.JSON(http.StatusForbidden, utils.AccessForbidden())
+	}
+
+	return c.JSON(http.StatusOK, types.NewPublicUsersResponse(h.UserStore.GetAllUsers()))
 }
 
 // Get User
