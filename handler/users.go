@@ -43,6 +43,10 @@ func (h *Handler) GetUsersById(c echo.Context) error {
 	var user types.User
 	id, err := strconv.Atoi(c.Param("id"))
 
+	if err != nil {
+		return c.JSON(utils.ErrorParameterNotInteger.Status, utils.ErrorParameterNotInteger)
+	}
+
 	isAdmin, err := h.UserStore.CheckUserAdmin(utils.GetUserIDFromContext(c))
 	isMe, err := h.UserStore.CheckUserMe(utils.GetUserIDFromContext(c), id)
 
@@ -71,18 +75,28 @@ func (h *Handler) GetUsersById(c echo.Context) error {
 // @Success 200 {object} types.PublicUserResponse	"ok"
 // @Router /users [post]
 func (h *Handler) CreateUser(c echo.Context) error {
-	// TODO reimplementation
-	return c.JSON(http.StatusForbidden, utils.AccessForbidden())
-	user := new(types.User)
+	var u types.User
+	req := &types.UserRegisterRequest{}
 
-	if err := c.Bind(user); err != nil {
-		return c.JSON(utils.ErrorCannotParseFields.Status, utils.ErrorCannotParseFields)
+	isAdmin, err := h.UserStore.CheckUserAdmin(utils.GetUserIDFromContext(c))
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewError(err))
 	}
 
-	h.DB.NewRecord(user)
-	h.DB.Create(&user)
+	if !isAdmin {
+		return c.JSON(http.StatusForbidden, utils.AccessForbidden())
+	}
 
-	return c.JSON(http.StatusOK, types.NewPublicUserResponse(user))
+	if err := req.Bind(c, &u); err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
+	}
+
+	if err := h.UserStore.CreateNewUser(&u); err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewError(err))
+	}
+
+	return c.JSON(http.StatusOK, types.NewPublicUserResponse(&u))
 }
 
 // Update User
@@ -95,14 +109,23 @@ func (h *Handler) CreateUser(c echo.Context) error {
 // @Success 200 {object} types.PublicUserResponse	"ok"
 // @Router /users/{id} [put]
 func (h *Handler) UpdateUser(c echo.Context) error {
-	// TODO reimplementation
-	return c.JSON(http.StatusForbidden, utils.AccessForbidden())
 	reqUser := new(types.User)
 	var user types.User
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
 		return c.JSON(utils.ErrorParameterNotInteger.Status, utils.ErrorParameterNotInteger)
+	}
+
+	isAdmin, err := h.UserStore.CheckUserAdmin(utils.GetUserIDFromContext(c))
+	isMe, err := h.UserStore.CheckUserMe(utils.GetUserIDFromContext(c), id)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewError(err))
+	}
+
+	if !isAdmin && !isMe {
+		return c.JSON(http.StatusForbidden, utils.AccessForbidden())
 	}
 
 	if err = c.Bind(reqUser); err != nil {
@@ -126,9 +149,23 @@ func (h *Handler) UpdateUser(c echo.Context) error {
 // @Success 200 {string} string	"ok"
 // @Router /users/{id} [delete]
 func (h *Handler) DeleteUser(c echo.Context) error {
-	// TODO reimplementation
-	return c.JSON(http.StatusForbidden, utils.AccessForbidden())
-	id, _ := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		return c.JSON(utils.ErrorParameterNotInteger.Status, utils.ErrorParameterNotInteger)
+	}
+
+	isAdmin, err := h.UserStore.CheckUserAdmin(utils.GetUserIDFromContext(c))
+	isMe, err := h.UserStore.CheckUserMe(utils.GetUserIDFromContext(c), id)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewError(err))
+	}
+
+	if !isAdmin && !isMe {
+		return c.JSON(http.StatusForbidden, utils.AccessForbidden())
+	}
+
 	h.DB.Where("id = ?", id).Delete(&types.User{})
 	return c.String(http.StatusOK, "ok")
 }
