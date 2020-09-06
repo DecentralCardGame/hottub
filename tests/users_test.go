@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/brianvoe/gofakeit"
 	"github.com/jinzhu/gorm"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	_ "github.com/mattn/go-sqlite3"
 	_ "github.com/stretchr/testify"
 	"github.com/stretchr/testify/assert"
