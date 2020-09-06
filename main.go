@@ -26,7 +26,7 @@ func main() {
 	db := database.New()
 	initializeEcho()
 	database.AutoMigrate(db)
-	h = &handler.Handler{DB: db}
+	h = handler.NewHandler(db, types.NewUserStore(db))
 	registerRoutes()
 
 	e.Logger.Fatal(e.Start(":1323"))

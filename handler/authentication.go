@@ -27,10 +27,9 @@ func (h *Handler) Register(c echo.Context) (err error) {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 	}
 
-	// Save user
-	// TODO: Move logic to store
-	h.DB.Create(&u)
-	h.DB.Save(&u)
+	if err := h.UserStore.CreateNewUser(&u); err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewError(err))
+	}
 
 	return c.JSON(http.StatusOK, types.NewUserLoginResponse(&u))
 }
@@ -52,15 +51,15 @@ func (h *Handler) Login(c echo.Context) (err error) {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 	}
 
-	// Find user
-	// TODO: Move logic to store
-	var dbUser types.User
-	h.DB.Where(&types.User{
-		Username: req.Username,
-	}).First(&dbUser)
+	dbUser, err := h.UserStore.GetByUsername(req.Username)
+
+	if err != nil {
+		return c.JSON(http.StatusNotFound, utils.NewError(err))
+	}
 
 	if !dbUser.ComparePassword(req.Password) {
 		return c.JSON(http.StatusForbidden, utils.AccessForbidden())
 	}
-	return c.JSON(http.StatusOK, types.NewUserLoginResponse(&dbUser))
+
+	return c.JSON(http.StatusOK, types.NewUserLoginResponse(dbUser))
 }

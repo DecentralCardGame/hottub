@@ -29,3 +29,68 @@ func (u *User) ComparePassword(plainText string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(plainText))
 	return err == nil
 }
+
+func (u *User) IsAdmin() bool {
+	return u.Admin
+}
+
+// Store
+
+type UserStore struct {
+	db *gorm.DB
+}
+
+func NewUserStore(db *gorm.DB) *UserStore {
+	return &UserStore{
+		db: db,
+	}
+}
+
+// Get by ID
+func (us *UserStore) GetByID(id uint) (*User, error) {
+	var m User
+	if err := us.db.First(&m, id).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &m, nil
+}
+
+// Check whether user is admin
+func (us *UserStore) GetByUsername(username string) (*User, error) {
+	var m User
+
+	if err := us.db.First(&m, &User{
+		Username: username,
+	}).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &m, nil
+}
+
+// Check whether user is admin
+func (us *UserStore) CheckUserAdmin(username string) (bool, error) {
+	var m User
+
+	if err := us.db.First(&m, User{
+		Username: username,
+	}).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return false, nil
+		}
+		return false, err
+	}
+
+	return m.IsAdmin(), nil
+}
+
+// Create user
+func (us *UserStore) CreateNewUser(user *User) error {
+	return us.db.Create(&user).Error
+}
