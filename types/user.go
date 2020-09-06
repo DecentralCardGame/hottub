@@ -8,13 +8,12 @@ import (
 
 type User struct {
 	gorm.Model
-	Username   string     `json:"username" form:"username" query:"username"`
-	Email      string     `gorm:"type:varchar(100);unique_index" json:"email" form:"email" query:"email"`
-	Password   string     `json:"password" form:"password" query:"password"`
-	Mnemonic   string     `json:"mnemonic" form:"mnemonic" query:"mnemonic"`
-	CosmosUser CosmosUser `json:"cosmos_user" form:"cosmos_user" query:"cosmos_user" gorm:"ForeignKey:ID"`
-	Token      string     `json:"token" form:"token" query:"token"`
-	Admin      bool       `gorm:"default:false" json:"admin" query:"admin"`
+	Username string `json:"username" form:"username" query:"username"`
+	Email    string `gorm:"type:varchar(100);unique_index" json:"email" form:"email" query:"email"`
+	Password string `json:"password" form:"password" query:"password"`
+	Mnemonic string `json:"mnemonic" form:"mnemonic" query:"mnemonic"`
+	Token    string `json:"token" form:"token" query:"token"`
+	Admin    bool   `gorm:"default:false" json:"admin" query:"admin"`
 }
 
 func (u *User) HashPassword(plain string) (string, error) {

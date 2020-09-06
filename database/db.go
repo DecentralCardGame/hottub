@@ -52,6 +52,5 @@ func DropTestDB() error {
 func AutoMigrate(db *gorm.DB) {
 	db.AutoMigrate(
 		&types.User{},
-		&types.CosmosUser{},
 	)
 }
