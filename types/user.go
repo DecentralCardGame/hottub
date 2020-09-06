@@ -33,6 +33,10 @@ func (u *User) IsAdmin() bool {
 	return u.Admin
 }
 
+func (u *User) IsMe(id uint) bool {
+	return u.ID == id
+}
+
 // Store
 
 type UserStore struct {
@@ -85,6 +89,19 @@ func (us *UserStore) CheckUserAdmin(id int) (bool, error) {
 	}
 
 	return m.IsAdmin(), nil
+}
+
+func (us *UserStore) CheckUserMe(context int, id int) (bool, error) {
+	var m User
+
+	if err := us.db.First(&m, context).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return false, nil
+		}
+		return false, err
+	}
+
+	return m.IsMe(uint(id)), nil
 }
 
 // Create user

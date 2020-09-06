@@ -40,14 +40,20 @@ func (h *Handler) GetUsers(c echo.Context) error {
 // @Success 200 {object} types.PublicUserResponse	"ok"
 // @Router /users/{id} [get]
 func (h *Handler) GetUsersById(c echo.Context) error {
-	// TODO reimplementation
-	return c.JSON(http.StatusForbidden, utils.AccessForbidden())
 	var user types.User
 	id, err := strconv.Atoi(c.Param("id"))
 
+	isAdmin, err := h.UserStore.CheckUserAdmin(utils.GetUserIDFromContext(c))
+	isMe, err := h.UserStore.CheckUserMe(utils.GetUserIDFromContext(c), id)
+
 	if err != nil {
-		return c.JSON(utils.ErrorParameterNotInteger.Status, utils.ErrorParameterNotInteger)
+		return c.JSON(http.StatusBadRequest, utils.NewError(err))
 	}
+
+	if !isAdmin && !isMe {
+		return c.JSON(http.StatusForbidden, utils.AccessForbidden())
+	}
+
 	h.DB.First(&user, id)
 	return c.JSON(http.StatusOK, types.NewPublicUserResponse(&user))
 }

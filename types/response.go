@@ -32,7 +32,7 @@ type PublicUsersRepsonse struct {
 func NewPublicUserResponse(u *User) *PublicUserResponse {
 	r := new(PublicUserResponse)
 	r.Email = u.Email
-	u.Username = u.Username
+	r.Username = u.Username
 	return r
 }
 
