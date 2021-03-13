@@ -7,3 +7,6 @@ Before you can compile hottub, you first have to run the following commands
 go get -u github.com/swaggo/swag/cmd/swag
 swag init
 ```
+
+## Dump PostgreSQL
+docker-compose exec database pg_dumpall -c -U crowdcontrol > dump_`date +%d-%m-%Y"_"%H_%M_%S`.sql
