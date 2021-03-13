@@ -9,4 +9,6 @@ swag init
 ```
 
 ## Dump PostgreSQL
+```shell script
 docker-compose exec database pg_dumpall -c -U crowdcontrol > dump_`date +%d-%m-%Y"_"%H_%M_%S`.sql
+```
